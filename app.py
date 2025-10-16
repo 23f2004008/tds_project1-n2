@@ -45,6 +45,11 @@ def update_repo_with_llm(repo_name, token, brief):
     subprocess.run(["git", "-C", temp_dir, "config", "user.email", "23f2004008@ds.study.iitm.ac.in"], check=True)
     subprocess.run(["git", "-C", temp_dir, "config", "user.name", "Pranavi (Auto LLM)"], check=True)
 
+    # ✅ Fix remote to include authentication
+    username = user.login
+    remote_url = f"https://{username}:{token}@github.com/{username}/{repo_name}.git"
+    subprocess.run(["git", "-C", temp_dir, "remote", "set-url", "origin", remote_url], check=True)
+
     index_path = os.path.join(temp_dir, "index.html")
     if not os.path.exists(index_path):
         raise Exception("index.html not found in existing repo")
@@ -79,7 +84,7 @@ def update_repo_with_llm(repo_name, token, brief):
     # Commit & push
     subprocess.run(["git", "-C", temp_dir, "add", "."], check=True)
     subprocess.run(["git", "-C", temp_dir, "commit", "--allow-empty", "-m", "Auto revision by LLM"], check=True)
-    subprocess.run(["git", "-C", temp_dir, "push"], check=True)
+    subprocess.run(["git", "-C", temp_dir, "push", "--force"], check=True)
 
     print("✅ Repo updated and pushed successfully for round 2.")
 

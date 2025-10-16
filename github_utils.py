@@ -30,54 +30,53 @@ def create_github_repo(repo_name, token):
 def push_to_github(repo_name, token, folder_path):
     """
     Push local files in folder_path to the specified GitHub repo.
-    Automatically sets remote and pushes the main branch.
+    Works for both Round 1 (new repo) and Round 2 (update existing repo).
     """
     g = Github(token)
     username = g.get_user().login
-    print("📦 Preparing to push code to GitHub...")
+    print(f"📦 Preparing to push code to GitHub repo: {repo_name}")
 
-    # Change to build directory
+    # Change working directory to folder_path
     os.chdir(folder_path)
 
-    # Initialize and commit files
+    # Initialize and configure Git
     subprocess.run(["git", "init"], check=True)
     subprocess.run(["git", "config", "user.email", "23f2004008@ds.study.iitm.ac.in"], check=True)
     subprocess.run(["git", "config", "user.name", "Pranavi (Auto LLM)"], check=True)
+
+    # Stage and commit all files
     subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(["git", "commit", "-m", "Initial commit"], check=True)
+    subprocess.run(["git", "commit", "-m", "Auto commit by LLM for round update"], check=True)
     subprocess.run(["git", "branch", "-M", "main"], check=True)
 
-    # Authenticated remote URL using HTTPS + token
+    # Authenticated remote URL
     remote_url = f"https://{username}:{token}@github.com/{username}/{repo_name}.git"
 
-    # Reset or create origin remote
-    subprocess.run(["git", "remote", "remove", "origin"], capture_output=True, text=True)
+    # Ensure remote is reset properly
+    subprocess.run(["git", "remote", "remove", "origin"], capture_output=True)
     subprocess.run(["git", "remote", "add", "origin", remote_url], check=True)
+    print("🔗 Remote origin set successfully.")
 
-    # ✅ Push safely (first pull if GitHub already added README or branch)
-    pull_proc = subprocess.run(
-        ["git", "pull", "origin", "main", "--rebase"],
-        capture_output=True,
-        text=True
-    )
-    if pull_proc.returncode != 0:
-        print("ℹ️ No remote branch to rebase (fresh repo). Proceeding to push...")
+    # Try fetching remote branch (in case repo already exists)
+    subprocess.run(["git", "fetch", "origin"], capture_output=True)
 
-    # Push main branch
+    # Force push safely
+    print("🚀 Pushing changes to GitHub (with --force)...")
     res = subprocess.run(
         ["git", "push", "-u", "origin", "main", "--force"],
         capture_output=True,
         text=True
     )
 
-
+    # Handle push result
     if res.returncode != 0:
         print("❌ GIT PUSH FAILED:")
         print(res.stderr)
-        raise RuntimeError(f"git push failed: {res.stderr.strip()}")
+        raise RuntimeError(f"git push failed with code {res.returncode}: {res.stderr.strip()}")
     else:
         print("✅ Git push success!")
-        print("✅ Code pushed successfully!")
+        print("✅ Code pushed successfully to:", remote_url)
+
 
 def enable_github_pages(repo):
     """

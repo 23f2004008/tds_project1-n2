@@ -41,8 +41,8 @@ def push_to_github(repo_name, token, folder_path):
 
     # Initialize and commit files
     subprocess.run(["git", "init"], check=True)
-    subprocess.run(["git", "config", "--global", "user.email", "23f2004008@ds.study.iitm.ac.in"], check=True)
-    subprocess.run(["git", "config", "--global", "user.name", "Pranavi (Auto LLM)"], check=True)
+    subprocess.run(["git", "config", "user.email", "23f2004008@ds.study.iitm.ac.in"], check=True)
+    subprocess.run(["git", "config", "user.name", "Pranavi (Auto LLM)"], check=True)
     subprocess.run(["git", "add", "."], check=True)
     subprocess.run(["git", "commit", "-m", "Initial commit"], check=True)
     subprocess.run(["git", "branch", "-M", "main"], check=True)
@@ -65,10 +65,11 @@ def push_to_github(repo_name, token, folder_path):
 
     # Push main branch
     res = subprocess.run(
-        ["git", "push", "-u", "origin", "main"],
+        ["git", "push", "-u", "origin", "main", "--force"],
         capture_output=True,
         text=True
     )
+
 
     if res.returncode != 0:
         print("❌ GIT PUSH FAILED:")

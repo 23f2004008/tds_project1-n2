@@ -46,7 +46,7 @@ def push_to_github(repo_name, token, folder_path):
 
     # Stage and commit all files
     subprocess.run(["git", "add", "."], check=True)
-    subprocess.run(["git", "commit", "-m", "Auto commit by LLM for round update"], check=True)
+    subprocess.run(["git", "commit", "--allow-empty", "-m", "Auto revision by LLM"], check=True)
     subprocess.run(["git", "branch", "-M", "main"], check=True)
 
     # Authenticated remote URL
